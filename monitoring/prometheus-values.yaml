@@ -40,7 +40,7 @@ alertmanager:
       smtp_smarthost: 'smtp.gmail.com:587'
       smtp_from: 'bhadrashine@gmail.com'
       smtp_auth_username: 'bhadrashine@gmail.com'
-      smtp_auth_password: 'gmnd gkhv ypko yubq'
+      smtp_auth_password: 'ngjyxdhbgpgwpuat'
       smtp_require_tls: true
 
     # ── Routing Rules ──────────────────────────────
