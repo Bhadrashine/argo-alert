@@ -32,7 +32,6 @@ alertmanager:
   service:
     type: NodePort
     nodePort: 30092
-
   config:
 
     # ── Global SMTP Settings ───────────────────────
@@ -52,13 +51,11 @@ alertmanager:
       repeat_interval: 12h
       receiver: 'email-alert'
       routes:
-        # critical alerts → email immediately
         - match:
             severity: critical
           receiver: 'email-alert'
           group_wait: 10s
           repeat_interval: 1h
-        # warning alerts → email every 4h
         - match:
             severity: warning
           receiver: 'email-alert'
@@ -89,7 +86,6 @@ alertmanager:
 
     # ── Inhibition Rules ───────────────────────────
     inhibit_rules:
-      # suppress warning if critical already firing for same app
       - source_match:
           severity: critical
         target_match:
