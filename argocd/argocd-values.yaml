@@ -1,0 +1,74 @@
+# ── ArgoCD Server ─────────────────────────────────
+server:
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 10m
+  service:
+    type: NodePort
+    nodePort: 30080
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: monitoring
+      additionalLabels:
+        release: kube-prom
+
+# ── Application Controller ────────────────────────
+controller:
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 50m
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: monitoring
+      additionalLabels:
+        release: kube-prom
+
+# ── Repo Server ───────────────────────────────────
+repoServer:
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 10m
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: monitoring
+      additionalLabels:
+        release: kube-prom
+
+# ── Redis ─────────────────────────────────────────
+redis:
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 10m
+
+# ── ApplicationSet Controller ─────────────────────
+applicationSet:
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 10m
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: monitoring
+      additionalLabels:
+        release: kube-prom
+
+# ── Global Metrics ────────────────────────────────
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    namespace: monitoring
+    additionalLabels:
+      release: kube-prom

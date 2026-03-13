@@ -1,0 +1,107 @@
+# ── Prometheus ────────────────────────────────────
+prometheus:
+  prometheusSpec:
+    retention: 6h
+    resources:
+      requests:
+        memory: 400Mi
+        cpu: 200m
+      limits:
+        memory: 800Mi
+    serviceMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+
+# ── Grafana ───────────────────────────────────────
+grafana:
+  adminPassword: admin123
+  resources:
+    requests:
+      memory: 100Mi
+      cpu: 50m
+  service:
+    type: NodePort
+    nodePort: 30090
+
+# ── AlertManager ──────────────────────────────────
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests:
+        memory: 50Mi
+        cpu: 20m
+  service:
+    type: NodePort
+    nodePort: 30092
+
+  config:
+
+    # ── Global SMTP Settings ───────────────────────
+    global:
+      resolve_timeout: 5m
+      smtp_smarthost: 'smtp.gmail.com:587'
+      smtp_from: 'yourgmail@gmail.com'
+      smtp_auth_username: 'yourgmail@gmail.com'
+      smtp_auth_password: 'your-app-password'
+      smtp_require_tls: true
+
+    # ── Routing Rules ──────────────────────────────
+    route:
+      group_by: ['alertname', 'app']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
+      receiver: 'email-alert'
+      routes:
+        # critical alerts → email immediately
+        - match:
+            severity: critical
+          receiver: 'email-alert'
+          group_wait: 10s
+          repeat_interval: 1h
+        # warning alerts → email every 4h
+        - match:
+            severity: warning
+          receiver: 'email-alert'
+          repeat_interval: 4h
+
+    # ── Receivers ─────────────────────────────────
+    receivers:
+      - name: 'email-alert'
+        email_configs:
+          - to: 'youremail@gmail.com'
+            send_resolved: true
+            headers:
+              subject: >-
+                [{{ .Status | toUpper }}] ArgoCD Alert - {{ .GroupLabels.alertname }}
+            html: |
+              <h2>ArgoCD Alert Notification</h2>
+              <p><b>Status:</b> {{ .Status | toUpper }}</p>
+              {{ range .Alerts }}
+              <hr>
+              <p><b>Alert:</b> {{ .Annotations.summary }}</p>
+              <p><b>Description:</b> {{ .Annotations.description }}</p>
+              <p><b>Severity:</b> {{ .Labels.severity }}</p>
+              <p><b>App Name:</b> {{ .Labels.name }}</p>
+              <p><b>Health Status:</b> {{ .Labels.health_status }}</p>
+              <p><b>Sync Status:</b> {{ .Labels.sync_status }}</p>
+              <p><b>Started:</b> {{ .StartsAt }}</p>
+              {{ end }}
+
+    # ── Inhibition Rules ───────────────────────────
+    inhibit_rules:
+      # suppress warning if critical already firing for same app
+      - source_match:
+          severity: critical
+        target_match:
+          severity: warning
+        equal: ['app', 'alertname']
+
+# ── Disabled Components (saves resources) ─────────
+kubeEtcd:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+nodeExporter:
+  enabled: true

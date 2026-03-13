@@ -1,0 +1,14 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: argo-alert
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 30080
+        hostPort: 30080  #argocdui
+      - containerPort: 30090
+        hostPort: 30090 #grafanaui
+      - containerPort: 30091
+        hostPort: 30091 #prometheusui
+      - containerPort: 30092
+        hostPort: 30092 #alertmanagerui
