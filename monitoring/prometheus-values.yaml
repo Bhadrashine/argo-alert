@@ -38,9 +38,9 @@ alertmanager:
     global:
       resolve_timeout: 5m
       smtp_smarthost: 'smtp.gmail.com:587'
-      smtp_from: 'yourgmail@gmail.com'
-      smtp_auth_username: 'yourgmail@gmail.com'
-      smtp_auth_password: 'your-app-password'
+      smtp_from: 'bhadrashine@gmail.com'
+      smtp_auth_username: 'bhadrashine@gmail.com'
+      smtp_auth_password: 'gmnd gkhv ypko yubq'
       smtp_require_tls: true
 
     # ── Routing Rules ──────────────────────────────
