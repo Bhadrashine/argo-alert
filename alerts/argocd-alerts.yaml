@@ -1,0 +1,43 @@
+# ── PrometheusRule for ArgoCD Alerts ──────────────
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: argocd-alerts
+  namespace: monitoring
+  labels:
+    release: kube-prom
+
+spec:
+  groups:
+    - name: argocd.rules
+      rules:
+
+        # ── OutOfSync Warning ──────────────────────
+        - alert: ArgoCDAppOutOfSync
+          expr: argocd_app_info{sync_status="OutOfSync"} == 1
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "App {{ $labels.name }} is OutOfSync"
+            description: "{{ $labels.name }} has been OutOfSync for 5 minutes"
+
+        # ── App Unhealthy Critical ─────────────────
+        - alert: ArgoCDAppUnhealthy
+          expr: argocd_app_info{health_status=~"Degraded|Unknown"} == 1
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "App {{ $labels.name }} is Unhealthy"
+            description: "{{ $labels.name }} health is {{ $labels.health_status }}"
+
+        # ── App Missing Critical ───────────────────
+        - alert: ArgoCDAppMissing
+          expr: argocd_app_info{health_status="Missing"} == 1
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "App {{ $labels.name }} is Missing"
+            description: "{{ $labels.name }} resources have been deleted"
